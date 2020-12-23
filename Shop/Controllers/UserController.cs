@@ -74,6 +74,7 @@ namespace Shop.Controllers
 
         [Route("{id:int}")]
         [Authorize(Roles = "manager")]
+        [HttpPut]
         public async Task<ActionResult<User>> Put([FromServices] DataContext context, int id, [FromBody] User model)
         {
             if (!ModelState.IsValid)

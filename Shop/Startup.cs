@@ -7,8 +7,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Shop.Data;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace Shop
@@ -19,11 +24,11 @@ namespace Shop
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-        }        
+        }
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
-        {            
+        {
             services.AddControllers();
             services.AddCors();
             //services.AddDbContext<DataContext>(opt => opt.UseInMemoryDatabase("Database"));
@@ -55,6 +60,37 @@ namespace Shop
                 };
             });
             services.AddScoped<DataContext, DataContext>();
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Shop API", Version = "v1" });
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = @"JWT Authorization header using the Bearer scheme. \r\n\r\n 
+                      Enter 'Bearer' [space] and then your token in the text input below.
+                      \r\n\r\nExample: 'Bearer 12345abcdef'",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                {
+                    {
+                      new OpenApiSecurityScheme
+                      {
+                        Reference = new OpenApiReference
+                          {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                          },
+                          Scheme = "oauth2",
+                          Name = "Bearer",
+                          In = ParameterLocation.Header,
+                        },
+                        new List<string>()
+                      }
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -67,6 +103,12 @@ namespace Shop
 
             app.UseRouting();
 
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Shop API V1");
+            });
+
             app.UseCors(
                 x =>
                 x.AllowAnyOrigin()
@@ -75,14 +117,14 @@ namespace Shop
             );
             app.UseHttpsRedirection();
             app.UseAuthentication();
-            app.UseAuthorization();          
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
                 //endpoints.MapGet("/", async context =>
                 //{
-                    
+
                 //    //await context.Response.WriteAsync("Hello World!");
                 //});
             });
