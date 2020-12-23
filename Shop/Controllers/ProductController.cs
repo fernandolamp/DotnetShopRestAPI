@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Shop.Data;
 using Shop.Models;
@@ -8,11 +9,12 @@ using System.Threading.Tasks;
 
 namespace Shop.Controllers
 {
-    [Route("products")]
+    [Route("v1/products")]
     public class ProductController : ControllerBase
     {
 
-        [HttpGet]
+        [AllowAnonymous]
+        [HttpGet]        
         public async Task<ActionResult<List<Product>>> Get([FromServices] DataContext context) {
             var products = await context.Products.Include(x => x.Category).AsNoTracking().ToListAsync();
             //var products = await context.Products.AsNoTracking().ToListAsync();
@@ -20,6 +22,7 @@ namespace Shop.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         [Route("categories/{id:int}")]
         public async Task<ActionResult<List<Product>>> GetProdcutsByCategoryId([FromServices] DataContext context, int id)
         {
@@ -38,6 +41,7 @@ namespace Shop.Controllers
         }
         
         [HttpGet]
+        [AllowAnonymous]
         [Route("{id:int}")]
         public async Task<ActionResult<Product>> GetById([FromServices] DataContext context, int id)
         {
@@ -46,6 +50,7 @@ namespace Shop.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "employee")]
         [Route("{id:int}")]
         public async Task<ActionResult<Product>> Put([FromServices] DataContext context, int id, [FromBody] Product product)
         {
@@ -67,6 +72,7 @@ namespace Shop.Controllers
         }
 
         [HttpDelete]
+        [Authorize(Roles = "employee")]
         [Route("id:int")]
         public async Task<ActionResult> Delete([FromServices] DataContext context, int id)
         {
@@ -84,6 +90,8 @@ namespace Shop.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "employee")]
+        [Authorize]
         public async Task<ActionResult<Product>> Post([FromServices] DataContext context, [FromBody] Product product)
         {
             if (!ModelState.IsValid)
