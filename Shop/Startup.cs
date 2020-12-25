@@ -34,7 +34,6 @@ namespace Shop
             //services.AddDbContext<DataContext>(opt => opt.UseInMemoryDatabase("Database"));
             services.AddDbContext<DataContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("connectionString")));
             //services.AddDbContext<DataContext>(opt => opt.);
-
             //adiciona compressão nas responstas json
             services.AddResponseCompression(opt =>
             {
@@ -59,7 +58,7 @@ namespace Shop
                     ValidateAudience = false
                 };
             });
-            services.AddScoped<DataContext, DataContext>();
+            
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Shop API", Version = "v1" });

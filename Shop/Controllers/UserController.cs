@@ -31,6 +31,7 @@ namespace Shop.Controllers
             {
                 context.User.Add(model);
                 await context.SaveChangesAsync();
+                model.Password = "*****";
                 return model;
             }
             catch
@@ -53,7 +54,7 @@ namespace Shop.Controllers
                 return NotFound(new { message = "Usuário ou senha inválido" });
 
             var token = TokenService.GenerateToken(user);
-
+            user.Password = "****";
             return new
             {
                 user = user,
