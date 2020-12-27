@@ -34,7 +34,7 @@ namespace Shop.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "employee")]
+        [Authorize(Roles = "employee,manager")]
         [Route("")]
         public async Task<ActionResult<Category>> Post(
             [FromBody] Category model,
@@ -57,7 +57,7 @@ namespace Shop.Controllers
         }
 
         [HttpDelete]
-        [Authorize(Roles = "employee")]
+        [Authorize(Roles = "employee,manager")]
         [Route("{id:int}")]
         public async Task<ActionResult<Category>> Delete(int id, [FromServices] DataContext context)
         {
@@ -80,7 +80,7 @@ namespace Shop.Controllers
         }
 
         [HttpPut]
-        [Authorize(Roles = "employee")]
+        [Authorize(Roles = "employee,manager")]
         [Route("{id:int}")]
         public async Task<ActionResult<Category>> Put(int id,
             [FromBody] Category model,

@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Shop.Data
 {
-    public class DataContext:DbContext
+    public class DataContext : DbContext
     {
-        public DataContext(DbContextOptions<DataContext> options): base(options)
+        public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
 
         }
@@ -17,6 +17,7 @@ namespace Shop.Data
         public DbSet<Product> Products { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<User> User { get; set; }
+        public DbSet<Setup> Setup {get;set;}
 
     }
 }

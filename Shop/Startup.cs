@@ -9,11 +9,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Shop.Data;
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 
 namespace Shop
@@ -31,9 +28,13 @@ namespace Shop
         {
             services.AddControllers();
             services.AddCors();
-            //services.AddDbContext<DataContext>(opt => opt.UseInMemoryDatabase("Database"));
-            services.AddDbContext<DataContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("connectionString")));
-            //services.AddDbContext<DataContext>(opt => opt.);
+            if(Configuration.GetValue<string>("DATABASE_PROVIDER") == "INMEMORY")
+            {
+                services.AddDbContext<DataContext>(opt => opt.UseInMemoryDatabase("Database"));
+            }else
+            {
+                services.AddDbContext<DataContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("connectionString")));
+            }            
             //adiciona compressão nas responstas json
             services.AddResponseCompression(opt =>
             {
