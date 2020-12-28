@@ -21,15 +21,19 @@ Algumas urls estão protegidas, é necessário fazer login e usar o token nesse 
 
 /users/login
 
-`
+```json
 {
   "username": "adm",
   "password": "123",
   "role":"manager"
 }
-`
+```
 
-O login irá retornar um token, para usar no swagger clique no botão `Authorization` e coloque o "bearer  `token`" ´(substitua o token)
+O login irá retornar um token, para usar no swagger clique no botão `Authorization` e coloque o "bearer  `token`" ´(substitua o token):
+
+Exemplo:
+
+`bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6ImFkbSIsImlkIjoiMSIsInJvbGUiOiJtYW5hZ2VyIiwibmJmIjoxNjA5MTI1MDI4LCJleHAiOjE2MDkxMzIyMjgsImlhdCI6MTYwOTEyNTAyOH0.Xw8lI9EmfQCU5xyvjgWIhSlCJsbzaiTqBQ5xZetfAf0`
 
 O admin padrão configurado é `admin`  senha `123`
 
@@ -50,15 +54,17 @@ Exemplo:
 
 appsettings.json
 
-`
+```json
+{
   "DATABASE_PROVIDER": "SQLSERVER",
   "ConnectionStrings": {
     "connectionString": "Server=localhost;Database=master;User Id=SA;Password=1q2w3e4r@#$;"
   }
 }
-`
+```
 
-Se estiver usando o SQL Server, configure a variбvel `connectionString` com os valores do banco de dados que seja utilizar.
+
+Se estiver usando o SQL Server, configure a variável `connectionString` com os valores do banco de dados que deseja utilizar.
 
 ## Docker Compose
 
@@ -70,7 +76,7 @@ Se preferir executar o docker compose:
 
 Se quiser montar a imagem docker e executar
 
-Na pasta do dockerfile execute o comando:
+Na pasta do dockerfile execute o comando: 
 
 `docker build -t shop:latest .`
 
