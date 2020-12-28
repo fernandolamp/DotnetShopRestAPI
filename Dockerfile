@@ -9,9 +9,9 @@ FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /src
 #COPY ["Shop/Shop.csproj", "Shop/"]
 
-COPY . ./Shop
+COPY . .
 
-RUN dotnet restore "Shop/Shop.csproj"
+RUN dotnet restore "./Shop.sln"
 
 WORKDIR "/src/Shop"
 RUN dotnet build "Shop.csproj" -c Release -o /app/build

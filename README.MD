@@ -2,13 +2,69 @@
 
 Simples API para estudo
 
-## Configura��o 
+Essa API foi montada para estudo. 
 
-Na execu��o local do projeto configure as vari�veis:
+O que foi abordado nos estudos dessa API:
 
-* DATABASE_PROVIDER : INMEMORY ou SQLSERVER
+* [Authorization](https://docs.microsoft.com/en-us/aspnet/core/security/authorization/introduction?view=aspnetcore-5.0)
+* [Role base Authorization](https://docs.microsoft.com/en-us/aspnet/core/security/authorization/roles?view=aspnetcore-5.0)
+* [EFCore Data Annotations](https://entityframeworkcore.com/model-data-annotations)
+* [FluentMigrator](https://fluentmigrator.github.io/)
 
-Se estiver usando o SQL Server, configure a vari�vel `connectionString` com os valores do banco de dados que seja utilizar.
+Ao executar a API pela primeira vez, se estiver usando o provider do SQLSERVER o sistema irá automáticamente
+executar as migrations e o seed usando o fluentmigrator.
+
+O swagger está no endpoint /swagger
+
+Algumas urls estão protegidas, é necessário fazer login e usar o token nesse caso:
+
+
+/users/login
+
+`
+{
+  "username": "adm",
+  "password": "123",
+  "role":"manager"
+}
+`
+
+O login irá retornar um token, para usar no swagger clique no botão `Authorization` e coloque o "bearer  `token`" ´(substitua o token)
+
+O admin padrão configurado é `admin`  senha `123`
+
+Produtos:
+  * `Torcida 200g`
+  * `Detergente`
+
+
+## Configuração 
+
+Para execução local do projeto é necessário configurar as variáveis:
+
+DATABASE_PROVIDER :
+* INMEMORY ou 
+* SQLSERVER
+
+Exemplo:
+
+appsettings.json
+
+`
+  "DATABASE_PROVIDER": "SQLSERVER",
+  "ConnectionStrings": {
+    "connectionString": "Server=localhost;Database=master;User Id=SA;Password=1q2w3e4r@#$;"
+  }
+}
+`
+
+Se estiver usando o SQL Server, configure a variбvel `connectionString` com os valores do banco de dados que seja utilizar.
+
+## Docker Compose
+
+Se preferir executar o docker compose:
+
+`docker-compose up`
 
 ## Docker
 
@@ -18,7 +74,7 @@ Na pasta do dockerfile execute o comando:
 
 `docker build -t shop:latest .`
 
-Para subir o servi�o:
+Para subir o serviзo:
 
 - Usando o inMemory provider:
 
@@ -27,6 +83,7 @@ Para subir o servi�o:
 - Usando o SQLServer :
 
 `docker run -p 8080:80 -e DATABASE_PROVIDER='SQLSERVER' -e ConnectionStrings__connectionString="SUA CONNECTION STRING" --name shop shop:latest`
+
 
 
 

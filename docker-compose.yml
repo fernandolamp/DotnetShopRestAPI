@@ -1,0 +1,18 @@
+version: "3.9"
+services:
+  web:
+    build: .
+    ports:
+      - "8080:80"
+    environment:
+      DATABASE_PROVIDER: "SQLSERVER"
+      ConnectionStrings__connectionString: Server=sqlserver;Database=master;User Id=SA;Password=CA5463&*2;
+    depends_on:
+      - sqlserver
+  sqlserver:
+    image: "mcr.microsoft.com/mssql/server:latest"
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: CA5463&*2
+    ports:
+      - "1433:1433"

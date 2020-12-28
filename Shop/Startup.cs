@@ -1,3 +1,4 @@
+using FluentMigrator.Runner;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -8,9 +9,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Migrator.Profile;
 using Shop.Data;
+using Shop.Migrations;
+using ShopMigrator.Migrations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace Shop
@@ -28,19 +34,31 @@ namespace Shop
         {
             services.AddControllers();
             services.AddCors();
-            if(Configuration.GetValue<string>("DATABASE_PROVIDER") == "INMEMORY")
+            services.AddDbContext<DataContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("connectionString")));
+            services.AddFluentMigratorCore().ConfigureRunner(rb =>
             {
-                services.AddDbContext<DataContext>(opt => opt.UseInMemoryDatabase("Database"));
-            }else
-            {
-                services.AddDbContext<DataContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("connectionString")));
-            }            
+                if (Configuration.GetValue<string>("DATABASE_PROVIDER") == "INMEMORY")
+                {
+                    rb.AddSQLite()
+                      .WithGlobalConnectionString(@"Data Source=:memory:");
+                }
+                else
+                {
+                    rb.AddSqlServer()
+                    .WithGlobalConnectionString(Configuration.GetConnectionString("connectionString"));
+                }
+                rb.ScanIn(new[] {
+                   typeof(InitialMigration).Assembly,
+                   typeof(InitialSeed20202712).Assembly
+               }).For.Migrations();
+            }).AddLogging(lb => lb.AddFluentMigratorConsole());
+
             //adiciona compressão nas responstas json
             services.AddResponseCompression(opt =>
-            {
-                opt.Providers.Add<GzipCompressionProvider>();
-                opt.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/json" });
-            });
+                {
+                    opt.Providers.Add<GzipCompressionProvider>();
+                    opt.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/json" });
+                });
 
             var key = Encoding.ASCII.GetBytes(Settings.Secret);
             services.AddAuthentication(x =>
@@ -59,13 +77,13 @@ namespace Shop
                     ValidateAudience = false
                 };
             });
-            
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Shop API", Version = "v1" });
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
-                    Description = @"JWT Authorization header using the Bearer scheme. \r\n\r\n 
+                    Description = @"JWT Authorization header using the Bearer scheme. 
                       Enter 'Bearer' [space] and then your token in the text input below.
                       \r\n\r\nExample: 'Bearer 12345abcdef'",
                     Name = "Authorization",
@@ -96,6 +114,7 @@ namespace Shop
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.Migrate();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -118,6 +137,7 @@ namespace Shop
             app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseAuthorization();
+
 
             app.UseEndpoints(endpoints =>
             {
